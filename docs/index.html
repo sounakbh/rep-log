@@ -8,6 +8,7 @@
 <style>
 :root{color-scheme:dark;--bg:#101613;--panel:#19221c;--line:#344237;--text:#f1f6ef;--muted:#b2c0b3;--lime:#d6fa93;--teal:#8de4c9;font:16px/1.5 system-ui,sans-serif}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text)}header{border-bottom:1px solid var(--line)}.bar,main{max-width:1100px;margin:auto;padding:0 24px}.bar{display:flex;align-items:center;justify-content:space-between;min-height:72px;gap:12px}.logo{font-weight:850;letter-spacing:.16em}.logo b{color:var(--lime)}nav,.actions,.month-control{display:flex;gap:8px;align-items:center;flex-wrap:wrap}main{padding-top:48px;padding-bottom:48px}.heading{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:25px}.eyebrow{text-transform:uppercase;letter-spacing:.14em;color:var(--lime);font-size:.8rem;font-weight:750;margin:0 0 6px}h1,h2,h3,p{margin:0}h1{font-size:clamp(2.3rem,7vw,4rem);line-height:1;letter-spacing:-.065em}h2{font-size:1.25rem;letter-spacing:-.025em}h3{font-size:1rem}.muted,small{color:var(--muted)}small{font-size:.875rem}button,input,select{font:inherit}button,.button{border:1px solid var(--line);background:#222e25;color:var(--text);padding:9px 13px;border-radius:8px;cursor:pointer;min-height:42px;font-weight:650;text-decoration:none}button:hover,.button:hover{border-color:var(--lime)}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--lime);outline-offset:2px}button:disabled{opacity:.5;cursor:wait}.primary{background:var(--lime);color:#172014;border-color:var(--lime)}nav button[aria-current]{color:var(--lime);border-color:#667b57}.grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:16px;align-items:start}.panel{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:20px;min-width:0}.panel-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}.weekday{text-align:center;color:var(--muted);font-size:.84rem;padding:0 0 5px}.day{padding:4px 2px;min-height:55px;background:#141d17;display:grid;place-content:center;justify-items:center;gap:2px;border-radius:7px;font-weight:600}.day[aria-pressed=true]{background:var(--lime);color:#172014;border-color:var(--lime)}.day[aria-current=date]:not([aria-pressed=true]){border-color:var(--lime)}.workout-icons{display:flex;justify-content:center;gap:1px;font-size:.8125rem;line-height:1;min-height:1em}.legend{display:flex;gap:16px;margin-top:14px;font-size:.875rem;color:var(--muted)}.legend span{display:flex;align-items:center;gap:6px}.entry,.exercise{padding:14px 0;border-top:1px solid var(--line)}.entry:last-child,.exercise:last-child{padding-bottom:0}.entry-top,.exercise-top{display:flex;align-items:start;justify-content:space-between;gap:10px}.entry p{margin-top:4px}.tag{font-size:.85rem;font-weight:750;color:var(--lime)}.tag.cardio{color:var(--teal)}.empty{padding:15px 0;color:var(--muted)}.form-grid,.set-row,.routine-row{display:grid;gap:10px;align-items:end}.form-grid{grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:16px}.set-row{grid-template-columns:repeat(3,minmax(0,1fr)) auto;margin:9px 0}.routine-row{grid-template-columns:minmax(0,2fr) repeat(2,minmax(0,1fr)) auto;margin:9px 0}.field{display:grid;gap:4px;font-size:.875rem;color:var(--muted);min-width:0}.field input,.field select{background:#111a14;color:var(--text);border:1px solid var(--line);border-radius:7px;width:100%;min-width:0;min-height:42px;padding:7px 9px;font-size:1rem}input[type=checkbox]{accent-color:var(--lime);width:20px;height:20px;margin:0}.check{display:flex;gap:9px;align-items:center;min-height:33px}.editor{max-width:760px}.editor .actions{margin-top:18px}.notice{margin-bottom:16px;color:var(--teal)}.notice:empty{display:none}.error{color:#ffb3a8}.routine-list{max-width:760px}.icon{padding-inline:10px}.inline{margin-top:10px}.history{margin-top:8px;padding-left:19px;color:var(--muted)}@media(max-width:720px){.grid{grid-template-columns:1fr}.bar,main{padding-inline:15px}main{padding-top:32px}.panel{padding:15px}.day{min-height:43px}.heading{align-items:start}.heading .primary{flex:none}.calendar{gap:4px}}@media(max-width:405px){.bar{gap:5px}.logo{font-size:.9rem}nav button{padding:7px 9px;font-size:.875rem}.heading{flex-wrap:wrap}.routine-row{grid-template-columns:repeat(2,minmax(0,1fr)) auto}.routine-row .field:first-child{grid-column:1/-1}.panel-title{gap:6px}.month-control{gap:4px}}
 dialog{max-width:min(430px,calc(100% - 32px));background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:14px;padding:20px}dialog::backdrop{background:#0009}
+.set-title{grid-column:1/-1;font-weight:700}.set-title small{margin-left:6px;color:var(--teal);font-weight:500}.set-actions{display:flex;gap:4px}.set-actions button{padding-inline:8px}.routine-row{grid-template-columns:minmax(0,2fr) repeat(3,minmax(0,1fr)) auto}@media(max-width:520px){.routine-row{grid-template-columns:repeat(3,minmax(0,1fr))}.routine-row .field:first-child{grid-column:1/-1}.routine-row button{justify-self:start}.set-row{grid-template-columns:repeat(3,minmax(0,1fr))}.set-actions{grid-column:1/-1}}
 </style>
 </head>
 <body>
@@ -25,8 +26,20 @@ const fullDate = date => format(date, { weekday:'long', month:'short', day:'nume
 const today = () => dateKey(new Date());
 const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[char]);
 const copy = value => structuredClone(value);
-const blank = () => ({ name:'', min:8, max:12 });
-const blankSet = item => ({ reps:null, weight:null, unit:item.sets.at(-1)?.unit || 'lb' });
+const defaultSetCount = 3;
+const maxSets = 50;
+const blank = () => ({ name:'', min:8, max:12, plannedSets:defaultSetCount });
+const blankSet = (item, slot = (item.sets.at(-1)?.slot ?? -1) + 1) =>
+  ({ slot, reps:null, weight:null, unit:item.sets.at(-1)?.unit || 'lb' });
+function prepareSets(item) {
+  const recorded = item.sets.map((set, index) => ({ ...set, slot:set.slot ?? index }));
+  const rows = new Map(recorded.map(set => [set.slot, set]));
+  for (let slot = 0; slot < (item.plannedSets ?? 0); slot++) {
+    if (!rows.has(slot)) rows.set(slot, blankSet(item, slot));
+  }
+  item.sets = [...rows.values()].sort((a,b) => a.slot - b.slot);
+}
+const savedDraft = () => records.find(row => row.id === draft.id);
 const emptySet = set => set.reps === null && set.weight === null;
 let refreshVersion = 0;
 let records = [], screen = 'calendar', selected = today(), month = dateFromKey(selected), draft, busy = true, ready = false;
@@ -165,7 +178,7 @@ function calendar() {
 function routineList() {
   return heading('Workout setup','Routines','new-routine','New routine')+
     '<section class="panel routine-list">'+(routines().map(row => '<article class="entry"><div class="entry-top"><div><h2>'+escape(row.name)+
-      '</h2><p class="muted">'+row.exercises.map(item => escape(item.name)+' ('+item.min+'–'+item.max+')').join(' · ')+
+      '</h2><p class="muted">'+row.exercises.map(item => escape(item.name)+' ('+(item.plannedSets ?? defaultSetCount)+' sets × '+item.min+'–'+item.max+' reps)').join(' · ')+
       '</p></div><button data-action="edit-routine" data-id="'+row.id+'">Edit</button></div></article>').join('') ||
       '<p class="empty">Create a routine to reuse its exercise checklist in your workouts.</p>')+'</section>';
 }
@@ -179,6 +192,17 @@ function select(label, key, value, options) {
 const reps = 'type="number" min="1" max="999" required inputmode="numeric"';
 const setReps = reps.replace(' required','');
 const nameAttrs = 'required maxlength="100"';
+function setRow(item, index, set, setIndex) {
+  const saved = savedDraft()?.exercises[index]?.sets.find((row, position) => (row.slot ?? position) === set.slot);
+  const stored = saved && ['reps','weight','unit'].every(key => saved[key] === set[key]);
+  return '<div class="set-row" data-set="'+setIndex+'"><div class="set-title">Set '+(setIndex + 1)+
+    ' <small data-set-status>'+(stored ? 'Saved' : '')+'</small></div>'+field('Reps','reps',set.reps,setReps)+
+    field('Weight','weight',set.weight,'type="number" min="0" max="10000" step="any" inputmode="decimal"')+
+    select('Unit','unit',set.unit,[['lb','lb'],['kg','kg']])+
+    '<div class="set-actions"><button type="button" data-action="save-set" aria-label="Save set '+(setIndex+1)+'">Save</button>'+
+    '<button type="button" data-action="remove-set" aria-label="'+(set.slot < item.plannedSets ? 'Clear' : 'Remove')+
+    ' set '+(setIndex+1)+'">×</button></div></div>';
+}
 function editor() {
   const routine = draft.kind === 'routine';
   const strength = draft.type === 'strength';
@@ -187,6 +211,7 @@ function editor() {
     fields = field('Routine name','name',draft.name,nameAttrs) + '<div class="inline"><h2>Exercises</h2>'+
       draft.exercises.map((item,index) => '<div class="routine-row" data-exercise="'+index+'">'+field('Exercise name','name',item.name,nameAttrs)+
         field('Min reps','min',item.min,reps)+field('Max reps','max',item.max,reps)+
+        field('Sets','plannedSets',item.plannedSets ?? defaultSetCount,'type="number" min="1" max="'+maxSets+'" required inputmode="numeric"')+
         '<button type="button" data-action="remove-exercise" aria-label="Remove exercise" '+(draft.exercises.length===1?'disabled':'')+'>Remove</button></div>').join('')+
       '<button type="button" data-action="add-exercise" '+(draft.exercises.length>=50?'disabled':'')+'>Add exercise</button></div>';
   } else {
@@ -203,11 +228,8 @@ function editor() {
     if (draft.exercises.length) fields += '<h2>Exercise checklist</h2>'+draft.exercises.map((item,index) =>
       '<section class="exercise" data-exercise="'+index+'"><div class="exercise-top"><label class="check"><input type="checkbox" data-key="done" '+(item.done?'checked':'')+
       '><span aria-hidden="true">'+exerciseStatus(item.done)+'</span><strong>'+escape(item.name)+'</strong></label><small>'+item.min+'–'+item.max+' reps</small></div>'+
-      item.sets.map((set,setIndex) => '<div class="set-row" data-set="'+setIndex+'">'+field('Reps','reps',set.reps,setReps)+
-      field('Weight','weight',set.weight,'type="number" min="0" max="10000" step="any" inputmode="decimal"')+
-      select('Unit','unit',set.unit,[['lb','lb'],['kg','kg']])+
-      '<button type="button" data-action="remove-set" aria-label="Remove set">×</button></div>').join('')+
-      '<button type="button" data-action="add-set" '+(item.sets.length>=50?'disabled':'')+'>Add set</button></section>').join('');
+      item.sets.map((set,setIndex) => setRow(item,index,set,setIndex)).join('')+
+      '<button type="button" data-action="add-set" '+(item.sets.length>=maxSets?'disabled':'')+'>Add set</button></section>').join('');
   }
   return heading(routine?'Workout setup':'Training log',draft.revision?'Edit '+draft.kind:(routine?'New routine':'Log workout'))+
     '<form class="panel editor" id="editor">'+fields+'<div class="actions"><button class="primary" type="submit" '+
@@ -232,7 +254,12 @@ function go(next) {
   render();
   if (next !== 'editor') void refresh();
 }
-function edit(record) { draft = copy(record); go('editor'); }
+function edit(record) {
+  draft = copy(record);
+  if (draft.kind === 'workout') draft.exercises.forEach(prepareSets);
+  else draft.exercises.forEach(item => { item.plannedSets ??= defaultSetCount; });
+  go('editor');
+}
 function locate(element) {
   const exercise = element.closest('[data-exercise]');
   const item = exercise ? draft.exercises[Number(exercise.dataset.exercise)] : null;
@@ -243,6 +270,7 @@ function capture(element) {
   if (!element.dataset.key || screen !== 'editor') return;
   const {item,setIndex} = locate(element);
   const target = setIndex !== null ? item.sets[setIndex] : item || draft;
+  if (setIndex !== null) element.closest('[data-set]').querySelector('[data-set-status]').textContent = '';
   target[element.dataset.key] = element.type === 'checkbox' ? element.checked :
     element.type === 'number' ? (element.value === '' ? null : element.valueAsNumber) : element.value;
 }
@@ -253,8 +281,8 @@ document.addEventListener('change', event => {
   if (element.dataset.key === 'done') {
     capture(element);
     const {item} = locate(element);
-    if (item.done && item.sets.length < 50 && !item.sets.some(emptySet)) item.sets.push(blankSet(item));
-    if (!item.done) item.sets = item.sets.filter(set => !emptySet(set));
+    if (item.done && !item.plannedSets && item.sets.length < maxSets && !item.sets.some(emptySet)) item.sets.push(blankSet(item));
+    if (!item.done && !item.plannedSets) item.sets = item.sets.filter(set => !emptySet(set));
     const index = draft.exercises.indexOf(item);
     render();
     view.querySelector('[data-exercise="'+index+'"] [data-key="done"]').focus();
@@ -264,7 +292,8 @@ document.addEventListener('change', event => {
   capture(element);
   if (element.dataset.key === 'routineId') {
     const chosen = routines().find(row => row.id === draft.routineId);
-    draft.exercises = chosen ? chosen.exercises.map(item => ({ ...item, done:false, sets:[] })) : [];
+    draft.exercises = chosen ? chosen.exercises.map(item => ({ ...item, plannedSets:item.plannedSets ?? defaultSetCount, done:false, sets:[] })) : [];
+    draft.exercises.forEach(prepareSets);
     draft.name = chosen?.name || '';
   }
   render();
@@ -304,13 +333,18 @@ document.addEventListener('click', event => {
     }, { once:true });
     dialog.showModal();
   }
+  if (action === 'save-set') void saveSet(button);
   if (action === 'cancel') go(draft.kind === 'routine' ? 'routines' : 'calendar');
   if (['add-exercise','remove-exercise','add-set','remove-set'].includes(action)) {
     const {item,setIndex} = locate(button);
     if (action === 'add-exercise') draft.exercises.push(blank());
     if (action === 'remove-exercise') draft.exercises.splice(draft.exercises.indexOf(item),1);
     if (action === 'add-set') item.sets.push(blankSet(item));
-    if (action === 'remove-set') item.sets.splice(setIndex,1);
+    if (action === 'remove-set') {
+      const {slot,unit} = item.sets[setIndex];
+      if (slot < item.plannedSets) item.sets[setIndex] = { ...blankSet(item,slot), unit };
+      else item.sets.splice(setIndex,1);
+    }
     render();
     if (action === 'add-exercise') view.querySelector('.routine-row:last-of-type input')?.focus();
     if (action === 'add-set') view.querySelector('[data-exercise="'+draft.exercises.indexOf(item)+'"] [data-set="'+(item.sets.length-1)+'"] input')?.focus();
@@ -380,21 +414,71 @@ document.addEventListener('submit', async event => {
     const routine = routines().find(row => row.id === submission.routineId);
     if (!submission.revision && routine) submission.name = routine.name;
   }
+  await saveEntry(submission);
+});
+async function saveSet(button) {
+  const {item,setIndex} = locate(button);
+  const row = button.closest('[data-set]');
+  const repsInput = row.querySelector('[data-key="reps"]');
+  if (repsInput.value === '') {
+    message('Enter reps before saving this set.', true);
+    repsInput.focus();
+    return;
+  }
+  for (const field of row.querySelectorAll('input')) {
+    if (!field.reportValidity()) return;
+  }
+  const previous = savedDraft();
+  if (draft.revision && previous?.revision !== draft.revision) {
+    message('This workout changed on another device. Reopen it to see the latest version.', true);
+    return;
+  }
+  if (!previous) {
+    for (const field of view.querySelectorAll('#editor .form-grid input')) {
+      if (!field.reportValidity()) return;
+    }
+  }
+  const submission = copy(previous ?? draft);
+  if (!submission.name.trim()) {
+    message('Enter a workout name before saving this set.', true);
+    return;
+  }
+  if (!previous) submission.exercises.forEach(exercise => { exercise.sets = []; });
+  const exerciseIndex = draft.exercises.indexOf(item);
+  const exercise = submission.exercises[exerciseIndex];
+  const set = item.sets[setIndex];
+  exercise.sets = exercise.sets
+    .map((saved,index) => ({ ...saved, slot:saved.slot ?? index }))
+    .filter(saved => saved.slot !== set.slot);
+  exercise.sets.push({ ...set });
+  exercise.sets.sort((a,b) => a.slot - b.slot);
+  exercise.done = item.done;
+  await saveEntry(submission, button);
+}
+async function saveEntry(submission, setButton) {
   busy = true;
   refreshVersion++;
-  const form = event.target;
-  const controls = [...form.elements].filter(element => !element.disabled);
+  const controls = [...view.querySelector('#editor').elements].filter(element => !element.disabled);
   controls.forEach(element => element.disabled = true);
   message('Saving…');
   try {
-    const saved = await api({method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(submission)});
+    const saved = await api({method:'PUT',body:JSON.stringify(submission)});
     records = [...records.filter(row => row.id !== saved.id),saved];
     if (saved.kind === 'workout') { selected = saved.date; month = dateFromKey(selected); }
-    go(saved.kind === 'routine' ? 'routines' : 'calendar');
-    message(saved.kind === 'routine' ? 'Routine saved.' : 'Workout saved.');
+    if (setButton) {
+      draft.revision = saved.revision;
+      const {item,setIndex} = locate(setButton);
+      const index = draft.exercises.indexOf(item);
+      render();
+      view.querySelector('[data-exercise="'+index+'"] [data-set="'+setIndex+'"] [data-action="save-set"]').focus();
+      message('Set '+(setIndex+1)+' saved.');
+    } else {
+      go(saved.kind === 'routine' ? 'routines' : 'calendar');
+      message(saved.kind === 'routine' ? 'Routine saved.' : 'Workout saved.');
+    }
   } catch (error) { message(error.message,true); }
   finally { busy = false; controls.forEach(element => element.disabled = false); }
-});
+}
 window.addEventListener('focus', () => { if (ready && !busy && screen !== 'editor') void refresh(); });
 void refresh(true);
 </script>
