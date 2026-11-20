@@ -1,4 +1,4 @@
 window.repLogConfig = {
-  url: '',
+  url: 'https://pifstiwrtpgddyjkgysc.supabase.co',
   publishableKey: ''
 };

@@ -8,7 +8,7 @@ create table if not exists public.rep_log_records (
 );
 alter table public.rep_log_records enable row level security;
 revoke all on public.rep_log_records from public, anon, authenticated;
-grant select, insert on public.rep_log_records to authenticated;
+grant select, insert, delete on public.rep_log_records to authenticated;
 grant update (body, revision) on public.rep_log_records to authenticated;
 drop policy if exists "Owners access their own entries" on public.rep_log_records;
 create policy "Owners access their own entries" on public.rep_log_records
