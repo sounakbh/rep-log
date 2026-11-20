@@ -1,0 +1,4 @@
+window.repLogConfig = {
+  url: '',
+  publishableKey: ''
+};

@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101613">
+<title>Rep Log</title>
+<style>
+:root{color-scheme:dark;--bg:#101613;--panel:#19221c;--line:#344237;--text:#f1f6ef;--muted:#b2c0b3;--lime:#d6fa93;--teal:#8de4c9;font:16px/1.5 system-ui,sans-serif}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text)}header{border-bottom:1px solid var(--line)}.bar,main{max-width:1100px;margin:auto;padding:0 24px}.bar{display:flex;align-items:center;justify-content:space-between;min-height:72px;gap:12px}.logo{font-weight:850;letter-spacing:.16em}.logo b{color:var(--lime)}nav,.actions,.month-control{display:flex;gap:8px;align-items:center;flex-wrap:wrap}main{padding-top:48px;padding-bottom:48px}.heading{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:25px}.eyebrow{text-transform:uppercase;letter-spacing:.14em;color:var(--lime);font-size:.8rem;font-weight:750;margin:0 0 6px}h1,h2,h3,p{margin:0}h1{font-size:clamp(2.3rem,7vw,4rem);line-height:1;letter-spacing:-.065em}h2{font-size:1.25rem;letter-spacing:-.025em}h3{font-size:1rem}.muted,small{color:var(--muted)}small{font-size:.875rem}button,input,select{font:inherit}button,.button{border:1px solid var(--line);background:#222e25;color:var(--text);padding:9px 13px;border-radius:8px;cursor:pointer;min-height:42px;font-weight:650;text-decoration:none}button:hover,.button:hover{border-color:var(--lime)}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--lime);outline-offset:2px}button:disabled{opacity:.5;cursor:wait}.primary{background:var(--lime);color:#172014;border-color:var(--lime)}nav button[aria-current]{color:var(--lime);border-color:#667b57}.grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:16px;align-items:start}.panel{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:20px;min-width:0}.panel-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}.weekday{text-align:center;color:var(--muted);font-size:.84rem;padding:0 0 5px}.day{padding:4px 2px;min-height:55px;background:#141d17;display:grid;place-content:center;justify-items:center;gap:2px;border-radius:7px;font-weight:600}.day[aria-pressed=true]{background:var(--lime);color:#172014;border-color:var(--lime)}.day[aria-current=date]:not([aria-pressed=true]){border-color:var(--lime)}.dots{display:flex;gap:4px;min-height:6px}.dot{width:6px;height:6px;border-radius:50%;background:var(--lime)}.dot.cardio{background:var(--teal)}.day[aria-pressed=true] .dot{background:#324321}.day[aria-pressed=true] .cardio{background:#326151}.legend{display:flex;gap:16px;margin-top:14px;font-size:.875rem;color:var(--muted)}.legend span{display:flex;align-items:center;gap:6px}.entry,.exercise{padding:14px 0;border-top:1px solid var(--line)}.entry:last-child,.exercise:last-child{padding-bottom:0}.entry-top,.exercise-top{display:flex;align-items:start;justify-content:space-between;gap:10px}.entry p{margin-top:4px}.tag{font-size:.85rem;font-weight:750;color:var(--lime)}.tag.cardio{color:var(--teal)}.empty{padding:15px 0;color:var(--muted)}.form-grid,.set-row,.routine-row{display:grid;gap:10px;align-items:end}.form-grid{grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:16px}.set-row{grid-template-columns:repeat(3,minmax(0,1fr)) auto;margin:9px 0}.routine-row{grid-template-columns:minmax(0,2fr) repeat(2,minmax(0,1fr)) auto;margin:9px 0}.field{display:grid;gap:4px;font-size:.875rem;color:var(--muted);min-width:0}.field input,.field select{background:#111a14;color:var(--text);border:1px solid var(--line);border-radius:7px;width:100%;min-width:0;min-height:42px;padding:7px 9px;font-size:1rem}input[type=checkbox]{accent-color:var(--lime);width:20px;height:20px;margin:0}.check{display:flex;gap:9px;align-items:center;min-height:33px}.editor{max-width:760px}.editor .actions{margin-top:18px}.notice{margin-bottom:16px;color:var(--teal)}.notice:empty{display:none}.error{color:#ffb3a8}.routine-list{max-width:760px}.icon{padding-inline:10px}.inline{margin-top:10px}.history{margin-top:8px;padding-left:19px;color:var(--muted)}@media(max-width:720px){.grid{grid-template-columns:1fr}.bar,main{padding-inline:15px}main{padding-top:32px}.panel{padding:15px}.day{min-height:43px}.heading{align-items:start}.heading .primary{flex:none}.calendar{gap:4px}}@media(max-width:405px){.bar{gap:5px}.logo{font-size:.9rem}nav button{padding:7px 9px;font-size:.875rem}.heading{flex-wrap:wrap}.routine-row{grid-template-columns:repeat(2,minmax(0,1fr)) auto}.routine-row .field:first-child{grid-column:1/-1}.panel-title{gap:6px}.month-control{gap:4px}}
+</style>
+</head>
+<body>
+<header><div class="bar"><span class="logo">REP <b>LOG</b></span><nav aria-label="Main"><button data-nav="calendar">Calendar</button><button data-nav="routines">Routines</button><button data-action="signout" hidden>Sign out</button></nav></div></header>
+<main><div id="notice" class="notice" role="status"></div><div id="view"><p>Loading your workout log…</p></div></main>
+<script src="./config.js"></script>
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.89.0";
+const view = document.querySelector('#view');
+const notice = document.querySelector('#notice');
+const dateKey = date => [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-');
+const dateFromKey = key => new Date(key + 'T12:00:00');
+const format = (date, options) => new Intl.DateTimeFormat(undefined, options).format(date);
+const fullDate = date => format(date, { weekday:'long', month:'short', day:'numeric' });
+const today = () => dateKey(new Date());
+const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[char]);
+const copy = value => structuredClone(value);
+const blank = () => ({ name:'', min:8, max:12 });
+let records = [], screen = 'calendar', selected = today(), month = dateFromKey(selected), draft, busy = true, ready = false;
+const routines = () => records.filter(row => row.kind === 'routine').sort((a,b) => a.name.localeCompare(b.name));
+const workouts = () => records.filter(row => row.kind === 'workout');
+const newRecord = kind => ({ kind, id:crypto.randomUUID(), revision:0, name:'', exercises:[] });
+
+function message(text = '', error = false) {
+  notice.textContent = text;
+  notice.classList.toggle('error', error);
+}
+const config = window.repLogConfig;
+const client = config.url && config.publishableKey ? createClient(config.url, config.publishableKey, {
+  auth: { storage: sessionStorage, detectSessionInUrl: false },
+  global: { fetch: (input, init) => fetch(input, { ...init, cache:'no-store' }) }
+}) : null;
+
+function signInScreen() {
+  view.innerHTML = heading('Private training log','Sign in') +
+    '<form class="panel editor" id="signin"><div class="form-grid">' +
+    '<label class="field">Email<input name="email" type="email" autocomplete="username" required></label>' +
+    '<label class="field">Password<input name="password" type="password" autocomplete="current-password" required></label>' +
+    '</div><button class="primary" type="submit">Sign in</button></form>';
+}
+
+const recordFromRow = ({ body, id, kind, revision }) => ({ ...body, id, kind, revision });
+async function api(options) {
+  if (!client) throw new Error('The database connection still needs to be configured.');
+  const { data: { session }, error: authError } = await client.auth.getSession();
+  if (authError || !session) throw Object.assign(new Error('Sign in to open your log.'), { signIn:true });
+  const table = () => client.from('rep_log_records');
+  const columns = 'body,id,kind,revision';
+  if (!options) {
+    const entries = [];
+    const pageSize = 250;
+    for (let start = 0; ; start += pageSize) {
+      const { data, error } = await table().select(columns).order('kind').order('id').range(start, start + pageSize - 1);
+      if (error) throw new Error('Could not load your workout log. Try again.');
+      entries.push(...data.map(recordFromRow));
+      if (data.length < pageSize) return entries;
+    }
+  }
+  const { id, kind, revision, ...body } = JSON.parse(options.body);
+  const result = revision === 0
+    ? await table().insert({ id, kind, body }).select(columns).single()
+    : await table().update({ body, revision:revision + 1 }).eq('id', id).eq('kind',kind)
+        .eq('revision',revision).select(columns).maybeSingle();
+  if (result.error?.code === '23505' || (!result.error && !result.data)) {
+    throw new Error('This entry changed on another device. Reopen it to see the latest version.');
+  }
+  if (result.error) throw new Error('Could not save this entry. Try again.');
+  return recordFromRow(result.data);
+}
+async function refresh(initial = false) {
+  try {
+    records = await api();
+    ready = true;
+    document.querySelector('[data-action=signout]').hidden = false;
+    if (initial || screen === 'calendar' || screen === 'routines') render();
+  } catch (error) {
+    message(error.message, true);
+    if (error.signIn) {
+      ready = false;
+      document.querySelector('[data-action=signout]').hidden = true;
+      records = [];
+      draft = null;
+      screen = 'calendar';
+      message();
+      signInScreen();
+    } else if (!ready) view.innerHTML = client ? '<button data-action="retry">Try again</button>' : '';
+  } finally {
+    if (initial) busy = false;
+  }
+}
+function heading(section, title, action, label) {
+  return '<div class="heading"><div><p class="eyebrow">'+section+'</p><h1>'+title+'</h1></div>'+
+    (action ? '<button class="primary" data-action="'+action+'">'+label+'</button>' : '')+'</div>';
+}
+function calendar() {
+  const year = month.getFullYear(), monthIndex = month.getMonth();
+  const days = new Date(year, monthIndex + 1, 0).getDate();
+  const first = new Date(year, monthIndex, 1).getDay();
+  const byDate = new Map();
+  for (const row of workouts()) {
+    if (!byDate.has(row.date)) byDate.set(row.date, []);
+    byDate.get(row.date).push(row);
+  }
+  const labels = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(day => '<div class="weekday">'+day+'</div>').join('');
+  let cells = '<div></div>'.repeat(first);
+  for (let day = 1; day <= days; day++) {
+    const date = new Date(year, monthIndex, day), key = dateKey(date), rows = byDate.get(key) || [];
+    const dots = ['strength','cardio'].filter(type => rows.some(row => row.type === type)).map(type => '<i class="dot '+type+'"></i>').join('');
+    cells += '<button class="day" data-date="'+key+'" aria-pressed="'+(key === selected)+'" '+(key === today()?'aria-current="date" ':'')+
+      'aria-label="'+fullDate(date)+', '+rows.length+' workouts">'+day+'<span class="dots">'+dots+'</span></button>';
+  }
+  const entries = (byDate.get(selected) || []).map(row => {
+    const strength = row.type === 'strength';
+    const details = strength ? row.exercises.filter(item => item.done).length+' of '+row.exercises.length+' exercises complete' :
+      escape(row.minutes)+' min'+(row.distance === null ? '' : ' · '+escape(row.distance)+' '+escape(row.distanceUnit || 'mi'));
+    const movements = row.exercises.map(item => '<li>'+escape(item.name)+(item.done?' ✓':'')+
+      (item.sets.length ? ' · '+item.sets.map(set => escape(set.reps)+' reps'+(set.weight === null ? '' : ' × '+escape(set.weight)+' '+escape(set.unit))).join(', ') : '')+'</li>').join('');
+    return '<article class="entry"><div class="entry-top"><div><div class="tag '+row.type+'">'+(strength?'Weight training':'Cardio')+
+      '</div><h3>'+escape(row.name)+'</h3></div><button data-action="edit-workout" data-id="'+row.id+'">Edit</button></div><p class="muted">'+details+
+      '</p>'+(movements ? '<ul class="history">'+movements+'</ul>' : '')+'</article>';
+  }).join('');
+  return heading('Training log','Workout calendar','new-workout','Log workout')+
+    '<div class="grid"><section class="panel"><div class="panel-title"><h2>'+format(month,{month:'long',year:'numeric'})+
+    '</h2><div class="month-control"><button class="icon" data-action="prev" aria-label="Previous month">‹</button><button data-action="today">Today</button><button class="icon" data-action="next" aria-label="Next month">›</button></div></div>'+
+    '<div class="calendar">'+labels+cells+'</div><div class="legend"><span><i class="dot"></i> Weight training</span><span><i class="dot cardio"></i> Cardio</span></div></section>'+
+    '<section class="panel"><div class="panel-title"><h2>'+fullDate(dateFromKey(selected))+'</h2></div>'+
+    (entries || '<p class="empty">No workouts logged for this day.</p>')+'</section></div>';
+}
+function routineList() {
+  return heading('Workout setup','Routines','new-routine','New routine')+
+    '<section class="panel routine-list">'+(routines().map(row => '<article class="entry"><div class="entry-top"><div><h2>'+escape(row.name)+
+      '</h2><p class="muted">'+row.exercises.map(item => escape(item.name)+' ('+item.min+'–'+item.max+')').join(' · ')+
+      '</p></div><button data-action="edit-routine" data-id="'+row.id+'">Edit</button></div></article>').join('') ||
+      '<p class="empty">Create a routine to reuse its exercise checklist in your workouts.</p>')+'</section>';
+}
+function field(label, key, value, attributes = '') {
+  return '<label class="field">'+label+'<input data-key="'+key+'" value="'+escape(value)+'" '+attributes+'></label>';
+}
+function select(label, key, value, options) {
+  return '<label class="field">'+label+'<select data-key="'+key+'">'+options.map(([id,name]) =>
+    '<option value="'+escape(id)+'" '+(id===value?'selected':'')+'>'+escape(name)+'</option>').join('')+'</select></label>';
+}
+const reps = 'type="number" min="1" max="999" required inputmode="numeric"';
+const nameAttrs = 'required maxlength="100"';
+function editor() {
+  const routine = draft.kind === 'routine';
+  const strength = draft.type === 'strength';
+  let fields = '';
+  if (routine) {
+    fields = field('Routine name','name',draft.name,nameAttrs) + '<div class="inline"><h2>Exercises</h2>'+
+      draft.exercises.map((item,index) => '<div class="routine-row" data-exercise="'+index+'">'+field('Exercise name','name',item.name,nameAttrs)+
+        field('Min reps','min',item.min,reps)+field('Max reps','max',item.max,reps)+
+        '<button type="button" data-action="remove-exercise" aria-label="Remove exercise" '+(draft.exercises.length===1?'disabled':'')+'>Remove</button></div>').join('')+
+      '<button type="button" data-action="add-exercise" '+(draft.exercises.length>=50?'disabled':'')+'>Add exercise</button></div>';
+  } else {
+    const choices = routines().map(row => [row.id,row.name]);
+    fields = '<div class="form-grid">'+field('Workout date','date',draft.date,'type="date" required')+
+      select('Training type','type',draft.type,[['strength','Weight training'],['cardio','Cardio']]);
+    if (!draft.revision) fields += select(strength?'Routine':'Routine (optional)','routineId',draft.routineId,[['','Choose a routine'],...choices]);
+    if (!strength) fields += field('Workout name','name',draft.name,nameAttrs)+
+      field('Duration (min)','minutes',draft.minutes,'type="number" min="0.1" max="1440" step="any" required inputmode="decimal"')+
+      field('Distance (optional)','distance',draft.distance,'type="number" min="0" max="10000" step="any" inputmode="decimal"')+
+      select('Distance unit','distanceUnit',draft.distanceUnit,[['mi','mi'],['km','km']]);
+    fields += '</div>';
+    if (strength && !draft.revision && !choices.length) fields += '<p class="empty">Create a routine before logging weight training.</p><button type="button" data-action="new-routine">New routine</button>';
+    if (draft.exercises.length) fields += '<h2>Exercise checklist</h2>'+draft.exercises.map((item,index) =>
+      '<section class="exercise" data-exercise="'+index+'"><div class="exercise-top"><label class="check"><input type="checkbox" data-key="done" '+(item.done?'checked':'')+
+      '><strong>'+escape(item.name)+'</strong></label><small>'+item.min+'–'+item.max+' reps</small></div>'+
+      item.sets.map((set,setIndex) => '<div class="set-row" data-set="'+setIndex+'">'+field('Reps','reps',set.reps,reps)+
+      field('Weight','weight',set.weight,'type="number" min="0" max="10000" step="any" inputmode="decimal"')+
+      select('Unit','unit',set.unit,[['lb','lb'],['kg','kg']])+
+      '<button type="button" data-action="remove-set" aria-label="Remove set">×</button></div>').join('')+
+      '<button type="button" data-action="add-set" '+(item.sets.length>=50?'disabled':'')+'>Add set</button></section>').join('');
+  }
+  return heading(routine?'Workout setup':'Training log',draft.revision?'Edit '+draft.kind:(routine?'New routine':'Log workout'))+
+    '<form class="panel editor" id="editor">'+fields+'<div class="actions"><button class="primary" type="submit" '+
+    (!routine && strength && !draft.exercises.length?'disabled':'')+'>Save '+draft.kind+'</button><button type="button" data-action="cancel">Cancel</button></div></form>';
+}
+function render() {
+  if (!ready) return;
+  document.querySelectorAll('[data-nav]').forEach(button => {
+    if (button.dataset.nav === screen || (screen === 'editor' && draft.kind === 'routine' && button.dataset.nav === 'routines') ||
+        (screen === 'editor' && draft.kind === 'workout' && button.dataset.nav === 'calendar')) button.setAttribute('aria-current','page');
+    else button.removeAttribute('aria-current');
+  });
+  view.innerHTML = screen === 'calendar' ? calendar() : screen === 'routines' ? routineList() : editor();
+}
+function go(next) {
+  screen = next;
+  message();
+  render();
+  if (next !== 'editor') void refresh();
+}
+function edit(record) { draft = copy(record); go('editor'); }
+function locate(element) {
+  const exercise = element.closest('[data-exercise]');
+  const item = exercise ? draft.exercises[Number(exercise.dataset.exercise)] : null;
+  const set = element.closest('[data-set]');
+  return { item, setIndex:set ? Number(set.dataset.set) : null };
+}
+function capture(element) {
+  if (!element.dataset.key || screen !== 'editor') return;
+  const {item,setIndex} = locate(element);
+  const target = setIndex !== null ? item.sets[setIndex] : item || draft;
+  target[element.dataset.key] = element.type === 'checkbox' ? element.checked :
+    element.type === 'number' ? (element.value === '' ? null : element.valueAsNumber) : element.value;
+}
+document.addEventListener('input', event => capture(event.target));
+document.addEventListener('change', event => {
+  const element = event.target;
+  if (screen !== 'editor' || !['routineId','type'].includes(element.dataset.key)) return;
+  capture(element);
+  if (element.dataset.key === 'routineId') {
+    const chosen = routines().find(row => row.id === draft.routineId);
+    draft.exercises = chosen ? chosen.exercises.map(item => ({ ...item, done:false, sets:[] })) : [];
+    draft.name = chosen?.name || '';
+  }
+  render();
+  view.querySelector('[data-key="'+element.dataset.key+'"]')?.focus();
+});
+document.addEventListener('click', event => {
+  const button = event.target.closest('button');
+  if (!button || busy) return;
+  const {nav,date,action,id} = button.dataset;
+  if (action === 'retry') { busy = true; message(); void refresh(true); return; }
+  if (!ready) return;
+  if (action === 'signout') {
+    busy = true;
+    void client.auth.signOut({ scope:'local' }).then(({error}) => {
+      if (error) { message('Could not sign out. Try again.', true); busy = false; }
+      else void refresh(true);
+    });
+    return;
+  }
+  if (nav) go(nav);
+  if (date) { selected = date; render(); view.querySelector('[data-date="'+date+'"]').focus(); }
+  if (action === 'today') { selected = today(); month = dateFromKey(selected); render(); }
+  if (action === 'prev' || action === 'next') {
+    month = new Date(month.getFullYear(), month.getMonth() + (action === 'prev' ? -1 : 1), 1);
+    selected = dateKey(month);
+    render();
+    view.querySelector('[data-action="'+action+'"]').focus();
+  }
+  if (action === 'new-routine') edit({ ...newRecord('routine'), exercises:[blank()] });
+  if (action === 'new-workout') edit({ ...newRecord('workout'), date:selected, type:'strength', routineId:'', minutes:null, distance:null, distanceUnit:'mi' });
+  if (action === 'edit-routine' || action === 'edit-workout') edit(records.find(row => row.id === id));
+  if (action === 'cancel') go(draft.kind === 'routine' ? 'routines' : 'calendar');
+  if (['add-exercise','remove-exercise','add-set','remove-set'].includes(action)) {
+    const {item,setIndex} = locate(button);
+    if (action === 'add-exercise') draft.exercises.push(blank());
+    if (action === 'remove-exercise') draft.exercises.splice(draft.exercises.indexOf(item),1);
+    if (action === 'add-set') item.sets.push({ reps:null, weight:null, unit:item.sets.at(-1)?.unit || 'lb' });
+    if (action === 'remove-set') item.sets.splice(setIndex,1);
+    render();
+    if (action === 'add-exercise') view.querySelector('.routine-row:last-of-type input')?.focus();
+    if (action === 'add-set') view.querySelector('[data-exercise="'+draft.exercises.indexOf(item)+'"] [data-set="'+(item.sets.length-1)+'"] input')?.focus();
+  }
+});
+document.addEventListener('submit', async event => {
+  if (event.target.id === 'signin') {
+    event.preventDefault();
+    if (busy) return;
+    busy = true;
+    const form = event.target;
+    const data = new FormData(form);
+    const button = form.querySelector('button');
+    button.disabled = true;
+    try {
+      const { error } = await client.auth.signInWithPassword({ email:data.get('email'), password:data.get('password') });
+      if (error) throw new Error('Sign-in failed. Check your email and password.');
+      form.reset();
+      message();
+      await refresh(true);
+    } catch (error) {
+      message(error.message, true);
+    } finally {
+      busy = false;
+      button.disabled = false;
+    }
+    return;
+  }
+  if (event.target.id !== 'editor') return;
+  event.preventDefault();
+  if (busy) return;
+  if (draft.exercises.some(item => item.min > item.max)) { message('Minimum reps must be at or below maximum reps.',true); return; }
+  const submission = copy(draft);
+  if ([submission.name, ...submission.exercises.map(item => item.name)].some(name => !name.trim())) {
+    message('Enter a name for the routine or workout and each exercise.', true);
+    return;
+  }
+  if (submission.type === 'strength') {
+    const routine = routines().find(row => row.id === submission.routineId);
+    if (!submission.revision && routine) submission.name = routine.name;
+  }
+  busy = true;
+  const form = event.target;
+  const controls = [...form.elements].filter(element => !element.disabled);
+  controls.forEach(element => element.disabled = true);
+  message('Saving…');
+  try {
+    const saved = await api({method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(submission)});
+    records = [...records.filter(row => row.id !== saved.id),saved];
+    if (saved.kind === 'workout') { selected = saved.date; month = dateFromKey(selected); }
+    go(saved.kind === 'routine' ? 'routines' : 'calendar');
+    message(saved.kind === 'routine' ? 'Routine saved.' : 'Workout saved.');
+  } catch (error) { message(error.message,true); }
+  finally { busy = false; controls.forEach(element => element.disabled = false); }
+});
+window.addEventListener('focus', () => { if (ready && !busy && screen !== 'editor') void refresh(); });
+void refresh(true);
+</script>
+</body>
+</html>
