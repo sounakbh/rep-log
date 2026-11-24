@@ -148,6 +148,12 @@ const workoutTypes = {
   cardio: { icon:'🏃', label:'Cardio' }
 };
 const exerciseStatus = done => done ? '✅' : '❌';
+function exerciseComplete(item) {
+  if (!item.plannedSets) return item.done;
+  const completed = item.sets.filter(set => Number.isInteger(set.reps) && set.reps >= 1 && set.reps <= 999 &&
+    (set.weight == null || (Number.isFinite(set.weight) && set.weight >= 0 && set.weight <= 10000)));
+  return completed.length >= item.plannedSets;
+}
 
 function calendar() {
   const year = month.getFullYear(), monthIndex = month.getMonth();
@@ -172,9 +178,9 @@ function calendar() {
   }
   const entries = (byDate.get(selected) || []).map(row => {
     const strength = row.type === 'strength';
-    const details = strength ? row.exercises.filter(item => item.done).length+' of '+row.exercises.length+' exercises complete' :
+    const details = strength ? row.exercises.filter(exerciseComplete).length+' of '+row.exercises.length+' exercises complete' :
       escape(row.minutes)+' min'+(row.distance === null ? '' : ' · '+escape(row.distance)+' '+escape(row.distanceUnit || 'mi'));
-    const movements = row.exercises.map(item => '<li><span role="img" aria-label="'+(item.done?'Complete':'Incomplete')+'">'+exerciseStatus(item.done)+
+    const movements = row.exercises.map(item => '<li><span role="img" aria-label="'+(exerciseComplete(item)?'Complete':'Incomplete')+'">'+exerciseStatus(exerciseComplete(item))+
       '</span> '+escape(item.name)+
       (item.sets.length ? ' · '+item.sets.map(set => escape(set.reps)+' reps'+(set.weight === null ? '' : ' × '+escape(set.weight)+' '+escape(set.unit))).join(', ') : '')+'</li>').join('');
     return '<article class="entry"><div class="entry-top"><div><div class="tag '+row.type+'">'+(strength?'Weight training':'Cardio')+
@@ -252,8 +258,8 @@ function editor() {
     fields += '</div>';
     if (strength && !draft.revision && !choices.length) fields += '<p class="empty">Create a routine before logging weight training.</p><button type="button" data-action="new-routine">New routine</button>';
     if (draft.exercises.length) fields += '<h2>Exercise checklist</h2>'+draft.exercises.map((item,index) =>
-      '<section class="exercise" data-exercise="'+index+'"><div class="exercise-top"><label class="check"><input type="checkbox" data-key="done" '+(item.done?'checked':'')+
-      '><span aria-hidden="true">'+exerciseStatus(item.done)+'</span><strong>'+escape(item.name)+'</strong></label><small>'+item.min+'–'+item.max+' reps</small></div>'+
+      '<section class="exercise" data-exercise="'+index+'"><div class="exercise-top"><label class="check"><input type="checkbox" data-key="done" '+(exerciseComplete(item)?'checked ':'')+(item.plannedSets?'disabled aria-label="'+escape(item.name)+' completion (automatic)"':'')+
+      '><span aria-hidden="true" data-exercise-status>'+exerciseStatus(exerciseComplete(item))+'</span><strong>'+escape(item.name)+'</strong></label><small>'+item.min+'–'+item.max+' reps</small></div>'+
       item.sets.map((set,setIndex) => setRow(item,index,set,setIndex)).join('')+
       '<button type="button" data-action="add-set" '+(item.sets.length>=maxSets?'disabled':'')+'>Add set</button></section>').join('');
   }
@@ -299,6 +305,12 @@ function capture(element) {
   if (setIndex !== null) element.closest('[data-set]').querySelector('[data-set-status]').textContent = '';
   target[element.dataset.key] = element.type === 'checkbox' ? element.checked :
     element.type === 'number' ? (element.value === '' ? null : element.valueAsNumber) : element.value;
+  if (setIndex !== null && item.plannedSets) {
+    const section = element.closest('[data-exercise]');
+    const done = exerciseComplete(item);
+    section.querySelector('[data-key="done"]').checked = done;
+    section.querySelector('[data-exercise-status]').textContent = exerciseStatus(done);
+  }
 }
 document.addEventListener('input', event => capture(event.target));
 document.addEventListener('change', event => {
@@ -430,6 +442,7 @@ document.addEventListener('submit', async event => {
   if (submission.kind === 'workout') {
     for (const item of submission.exercises) {
       item.sets = item.sets.filter(set => !emptySet(set));
+      item.done = exerciseComplete(item);
       if (item.sets.some(set => set.reps === null)) {
         message('Enter reps for each set with a weight.', true);
         return;
@@ -478,7 +491,7 @@ async function saveSet(button) {
     .filter(saved => saved.slot !== set.slot);
   exercise.sets.push({ ...set });
   exercise.sets.sort((a,b) => a.slot - b.slot);
-  exercise.done = item.done;
+  exercise.done = exercise.plannedSets ? exerciseComplete(exercise) : item.done;
   await saveEntry(submission, button);
 }
 async function saveEntry(submission, setButton) {
