@@ -264,7 +264,7 @@ function editor() {
     if (strength && !draft.revision && !choices.length) fields += '<p class="empty">Create a routine before logging weight training.</p><button type="button" data-action="new-routine">New routine</button>';
     if (draft.exercises.length) fields += '<h2>Exercise checklist</h2>'+draft.exercises.map((item,index) => {
       const done = exerciseComplete(item);
-      return '<details class="exercise" data-exercise="'+index+'" '+(done?'':'open')+'>'+
+      return '<details class="exercise" data-exercise="'+index+'">'+
         '<summary class="exercise-summary"><span class="exercise-name">'+(index+1)+'. '+escape(item.name)+'</span>'+
         '<small>'+item.min+'–'+item.max+' reps</small>'+
         '<span data-exercise-status role="img" aria-label="'+(done?'Complete':'Incomplete')+'">'+exerciseStatus(done)+'</span></summary>'+
