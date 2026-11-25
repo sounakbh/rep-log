@@ -23,6 +23,10 @@ dialog{max-width:min(430px,calc(100% - 32px));background:var(--panel);color:var(
 .routine-exercises tbody th{font-weight:550}
 .routine-exercises td{color:var(--lime)}
 @media(max-width:420px){.routine-card .entry-top{padding-inline:14px}.routine-exercises tr > :first-child{padding-left:14px}.routine-exercises tr > :last-child{padding-right:14px}.routine-exercises th,.routine-exercises td{padding-inline:8px}}
+.exercise-summary{cursor:pointer;padding-block:8px;line-height:1.4;overflow-wrap:anywhere}
+.exercise-summary:focus-visible{outline:2px solid var(--lime);outline-offset:3px;border-radius:4px}
+.exercise-name{font-weight:700}.exercise-summary small,.exercise-summary [data-exercise-status]{display:inline-block;margin-left:8px}
+.exercise-sets{padding:4px 0 8px}
 </style>
 </head>
 <body>
@@ -258,11 +262,17 @@ function editor() {
       select('Distance unit','distanceUnit',draft.distanceUnit,[['mi','mi'],['km','km']]);
     fields += '</div>';
     if (strength && !draft.revision && !choices.length) fields += '<p class="empty">Create a routine before logging weight training.</p><button type="button" data-action="new-routine">New routine</button>';
-    if (draft.exercises.length) fields += '<h2>Exercise checklist</h2>'+draft.exercises.map((item,index) =>
-      '<section class="exercise" data-exercise="'+index+'"><div class="exercise-top"><label class="check"><input type="checkbox" data-key="done" '+(exerciseComplete(item)?'checked ':'')+(item.plannedSets?'disabled aria-label="'+escape(item.name)+' completion (automatic)"':'')+
-      '><span aria-hidden="true" data-exercise-status>'+exerciseStatus(exerciseComplete(item))+'</span><strong>'+escape(item.name)+'</strong></label><small>'+item.min+'–'+item.max+' reps</small></div>'+
-      item.sets.map((set,setIndex) => setRow(item,index,set,setIndex)).join('')+
-      '<button type="button" data-action="add-set" '+(item.sets.length>=maxSets?'disabled':'')+'>Add set</button></section>').join('');
+    if (draft.exercises.length) fields += '<h2>Exercise checklist</h2>'+draft.exercises.map((item,index) => {
+      const done = exerciseComplete(item);
+      return '<details class="exercise" data-exercise="'+index+'" '+(done?'':'open')+'>'+
+        '<summary class="exercise-summary"><span class="exercise-name">'+(index+1)+'. '+escape(item.name)+'</span>'+
+        '<small>'+item.min+'–'+item.max+' reps</small>'+
+        '<span data-exercise-status role="img" aria-label="'+(done?'Complete':'Incomplete')+'">'+exerciseStatus(done)+'</span></summary>'+
+        '<div class="exercise-sets">'+(item.plannedSets ? '' :
+          '<label class="check"><input type="checkbox" data-key="done" '+(done?'checked':'')+'>Mark complete</label>')+
+        item.sets.map((set,setIndex) => setRow(item,index,set,setIndex)).join('')+
+        '<button type="button" data-action="add-set" '+(item.sets.length>=maxSets?'disabled':'')+'>Add set</button></div></details>';
+    }).join('');
   }
   return heading(routine?'Workout setup':'Training log',draft.revision?'Edit '+draft.kind:(routine?'New routine':'Log workout'))+
     '<form class="panel editor" id="editor">'+fields+'<div class="actions"><button class="primary" type="submit" '+
@@ -272,19 +282,25 @@ function editor() {
     (routine ? 'Past workouts using this routine will stay in your calendar.' : 'This workout will be removed from your calendar.')+
     '</p><div class="actions inline"><button value="cancel" autofocus>Cancel</button><button class="error" value="delete">Delete</button></div></form></dialog>' : '');
 }
-function render() {
+function render(preserveSections = true) {
   if (!ready) return;
+  const sections = preserveSections && screen === 'editor'
+    ? [...view.querySelectorAll('details[data-exercise]')] : [];
   document.querySelectorAll('[data-nav]').forEach(button => {
     if (button.dataset.nav === screen || (screen === 'editor' && draft.kind === 'routine' && button.dataset.nav === 'routines') ||
         (screen === 'editor' && draft.kind === 'workout' && button.dataset.nav === 'calendar')) button.setAttribute('aria-current','page');
     else button.removeAttribute('aria-current');
   });
   view.innerHTML = screen === 'calendar' ? calendar() : screen === 'routines' ? routineList() : editor();
+  for (const section of sections) {
+    const replacement = view.querySelector('details[data-exercise="'+section.dataset.exercise+'"]');
+    if (replacement) replacement.open = section.open;
+  }
 }
 function go(next) {
   screen = next;
   message();
-  render();
+  render(false);
   if (next !== 'editor') void refresh();
 }
 function edit(record) {
@@ -309,11 +325,16 @@ function capture(element) {
   if (setIndex !== null && item.plannedSets) {
     const section = element.closest('[data-exercise]');
     const done = exerciseComplete(item);
-    section.querySelector('[data-key="done"]').checked = done;
-    section.querySelector('[data-exercise-status]').textContent = exerciseStatus(done);
+    const status = section.querySelector('[data-exercise-status]');
+    status.textContent = exerciseStatus(done);
+    status.setAttribute('aria-label', done ? 'Complete' : 'Incomplete');
   }
 }
 document.addEventListener('input', event => capture(event.target));
+document.addEventListener('invalid', event => {
+  const section = event.target.closest('details[data-exercise]');
+  if (section) section.open = true;
+}, true);
 document.addEventListener('change', event => {
   const element = event.target;
   if (screen !== 'editor') return;
@@ -335,7 +356,7 @@ document.addEventListener('change', event => {
     draft.exercises.forEach(prepareSets);
     draft.name = chosen?.name || '';
   }
-  render();
+  render(element.dataset.key !== 'routineId');
   view.querySelector('[data-key="'+element.dataset.key+'"]')?.focus();
 });
 document.addEventListener('click', event => {
@@ -503,14 +524,22 @@ async function saveEntry(submission, setButton) {
   message('Saving…');
   try {
     const saved = await api({method:'PUT',body:JSON.stringify(submission)});
+    const previous = savedDraft();
     records = [...records.filter(row => row.id !== saved.id),saved];
     if (saved.kind === 'workout') { selected = saved.date; month = dateFromKey(selected); }
     if (setButton) {
       draft.revision = saved.revision;
       const {item,setIndex} = locate(setButton);
       const index = draft.exercises.indexOf(item);
+      const section = setButton.closest('details');
+      const wasComplete = previous?.exercises[index] && exerciseComplete(previous.exercises[index]);
+      if (!wasComplete && exerciseComplete(saved.exercises[index]) && exerciseComplete(item)) section.open = false;
       render();
-      view.querySelector('[data-exercise="'+index+'"] [data-set="'+setIndex+'"] [data-action="save-set"]').focus();
+      const replacement = view.querySelector('details[data-exercise="'+index+'"]');
+      const focusTarget = replacement.open
+        ? replacement.querySelector('[data-set="'+setIndex+'"] [data-action="save-set"]')
+        : replacement.querySelector('summary');
+      focusTarget.focus();
       message('Set '+(setIndex+1)+' saved.');
     } else {
       go(saved.kind === 'routine' ? 'routines' : 'calendar');
