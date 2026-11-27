@@ -27,6 +27,8 @@ dialog{max-width:min(430px,calc(100% - 32px));background:var(--panel);color:var(
 .exercise-summary:focus-visible{outline:2px solid var(--lime);outline-offset:3px;border-radius:4px}
 .exercise-name{font-weight:700}.exercise-summary small,.exercise-summary [data-exercise-status]{display:inline-block;margin-left:8px}
 .exercise-sets{padding:4px 0 8px}
+.workout-fields .field{grid-template-columns:minmax(0,1fr)}
+@media(max-width:600px){.workout-fields{grid-template-columns:minmax(0,1fr)}}
 </style>
 </head>
 <body>
@@ -253,7 +255,7 @@ function editor() {
       '<button type="button" data-action="add-exercise" '+(draft.exercises.length>=50?'disabled':'')+'>Add exercise</button></div>';
   } else {
     const choices = routines().map(row => [row.id,row.name]);
-    fields = '<div class="form-grid">'+field('Workout date','date',draft.date,'type="date" required')+
+    fields = '<div class="form-grid workout-fields">'+field('Workout date','date',draft.date,'type="date" required')+
       select('Training type','type',draft.type,[['strength','Weight training'],['cardio','Cardio']]);
     if (!draft.revision) fields += select(strength?'Routine':'Routine (optional)','routineId',draft.routineId,[['','Choose a routine'],...choices]);
     if (!strength) fields += field('Workout name','name',draft.name,nameAttrs)+
